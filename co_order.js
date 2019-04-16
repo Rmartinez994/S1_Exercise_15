@@ -34,6 +34,14 @@ window.addEventListener("load", function () {
 
       //calculate the cost of the order 
       calcOrder();
+      //event handlers for the web form
+      orderForm.elements.model.onchange = calcOrder;
+      orderForm.elements.qty.onchange = calcOrder;
+
+      var planOptions = documet.querySelectorAll('input[name="protection]');
+      for (var i = 0; i < planOptions.length; i++) {
+            planOptions[i].onclick = calcOrder;
+      }
 });
 
 function calOrder() {
@@ -46,11 +54,33 @@ function calOrder() {
 
       //initial cost = model cost x quantity
       var initialCost = mCost + quantity;
-      orderForm.elements.initialCost.value = initialCost;
+      orderForm.elements.initialCost.value = formatUSCurrency(initialCost);
 
       //retrieve the cost of the user's protection plan
       var pCost = document.querySelector('input[name="protection]:checked')
             .value + quantity;
-      orderForm.elements.protectionCost.value = pCost;
+      orderForm.elements.protectionCost.value = formalNumber(pCost, 2);
+      //calulate the order subtotal 
+      orderForm.elements.suntotal.value = formalNumber(initialCost + pCost, 2);
+      //calculate the sales tax
+      var salesTax = 0.05(initialCost + pCost);
+      orderForm.elements.salesTax.value = formalNumber(salesTax, 2);
+      //calculate the cost of the total order
+      var totalCost = initialCost + pCost + salesTax;
+      orderForm.elements.totalCost.value = formalUSCurrency(totalCost);
 
 }
+
+function formalNumber(val, decimal) {
+      return val.toLocaleString(undefined, {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+      })
+}
+
+function formalUSCurrency(val) {
+      return val.toLocaleString('en-us', {
+            style: "currency",
+            currency: "USD"
+      })
+};
